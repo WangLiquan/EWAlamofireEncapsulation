@@ -15,6 +15,10 @@
 		7963FE43214257120004C382 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7963FE41214257120004C382 /* LaunchScreen.storyboard */; };
 		7963FE4E214257120004C382 /* AlamofireEncapsulationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7963FE4D214257120004C382 /* AlamofireEncapsulationTests.swift */; };
 		7963FE59214257120004C382 /* AlamofireEncapsulationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7963FE58214257120004C382 /* AlamofireEncapsulationUITests.swift */; };
+		7963FE67214258E60004C382 /* EWNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7963FE66214258E60004C382 /* EWNetworking.swift */; };
+		7963FE6921425CEA0004C382 /* EWKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7963FE6821425CEA0004C382 /* EWKeychain.swift */; };
+		7963FE6B214261EB0004C382 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7963FE6A214261EB0004C382 /* String+Extension.swift */; };
+		7963FE6E2142690C0004C382 /* EWNetworking+test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7963FE6D2142690C0004C382 /* EWNetworking+test.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +53,11 @@
 		7963FE54214257120004C382 /* AlamofireEncapsulationUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlamofireEncapsulationUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7963FE58214257120004C382 /* AlamofireEncapsulationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlamofireEncapsulationUITests.swift; sourceTree = "<group>"; };
 		7963FE5A214257120004C382 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7963FE66214258E60004C382 /* EWNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EWNetworking.swift; sourceTree = "<group>"; };
+		7963FE6821425CEA0004C382 /* EWKeychain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EWKeychain.swift; sourceTree = "<group>"; };
+		7963FE6A214261EB0004C382 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		7963FE6C214265E70004C382 /* AlamofireEncapsulation-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AlamofireEncapsulation-Bridging-Header.h"; sourceTree = "<group>"; };
+		7963FE6D2142690C0004C382 /* EWNetworking+test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EWNetworking+test.swift"; sourceTree = "<group>"; };
 		8584FE69EF5E87D27DA0E579 /* Pods_AlamofireEncapsulation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AlamofireEncapsulation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F3C7B90E8802CE8D3F7A74BC /* Pods-AlamofireEncapsulation.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AlamofireEncapsulation.release.xcconfig"; path = "Pods/Target Support Files/Pods-AlamofireEncapsulation/Pods-AlamofireEncapsulation.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -113,8 +122,13 @@
 		7963FE37214257070004C382 /* AlamofireEncapsulation */ = {
 			isa = PBXGroup;
 			children = (
+				7963FE6C214265E70004C382 /* AlamofireEncapsulation-Bridging-Header.h */,
+				7963FE6821425CEA0004C382 /* EWKeychain.swift */,
 				7963FE38214257070004C382 /* AppDelegate.swift */,
 				7963FE3A214257070004C382 /* ViewController.swift */,
+				7963FE66214258E60004C382 /* EWNetworking.swift */,
+				7963FE6D2142690C0004C382 /* EWNetworking+test.swift */,
+				7963FE6A214261EB0004C382 /* String+Extension.swift */,
 				7963FE3C214257070004C382 /* Main.storyboard */,
 				7963FE3F214257120004C382 /* Assets.xcassets */,
 				7963FE41214257120004C382 /* LaunchScreen.storyboard */,
@@ -304,10 +318,12 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-AlamofireEncapsulation/Pods-AlamofireEncapsulation-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -321,8 +337,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7963FE6921425CEA0004C382 /* EWKeychain.swift in Sources */,
 				7963FE3B214257070004C382 /* ViewController.swift in Sources */,
 				7963FE39214257070004C382 /* AppDelegate.swift in Sources */,
+				7963FE6B214261EB0004C382 /* String+Extension.swift in Sources */,
+				7963FE67214258E60004C382 /* EWNetworking.swift in Sources */,
+				7963FE6E2142690C0004C382 /* EWNetworking+test.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -499,9 +519,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = B8V4DCL3BF;
 				INFOPLIST_FILE = AlamofireEncapsulation/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/AlamofireEncapsulation-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -515,9 +539,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = B8V4DCL3BF;
 				INFOPLIST_FILE = AlamofireEncapsulation/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/AlamofireEncapsulation-Bridging-Header.h";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -531,7 +559,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = B8V4DCL3BF;
 				INFOPLIST_FILE = AlamofireEncapsulationTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -548,7 +580,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = B8V4DCL3BF;
 				INFOPLIST_FILE = AlamofireEncapsulationTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -564,7 +600,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = B8V4DCL3BF;
 				INFOPLIST_FILE = AlamofireEncapsulationUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulationUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
@@ -580,7 +620,11 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = B8V4DCL3BF;
 				INFOPLIST_FILE = AlamofireEncapsulationUITests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulationUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
