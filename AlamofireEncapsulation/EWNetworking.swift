@@ -9,7 +9,7 @@
 import UIKit
 import Alamofire
 import SwiftyJSON
-
+///环境url,根据自己需求更改
 #if PRODUCTION
 let baseDomain = "http://www.baidu.com"
 let basePicPath = "http://www.baidu.com/upload/"
