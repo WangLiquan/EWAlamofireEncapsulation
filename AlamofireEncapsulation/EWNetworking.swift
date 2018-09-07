@@ -301,6 +301,7 @@ class EWNetworking: NSObject {
                                    parameters: Dictionary<String,Any>?){
         if !(responseObject is NSNull) {
             let directoryPath:String = cachePath
+            ///如果没有目录,那么新建目录
             if !FileManager.default.fileExists(atPath: directoryPath, isDirectory: nil){
                 do {
                     try FileManager.default.createDirectory(atPath: directoryPath,
@@ -311,15 +312,20 @@ class EWNetworking: NSObject {
                     return
                 }
             }
+            ///将get请求下的参数拼接到url上
             let absoluterURL = self.generateGETAbsoluteURL(url: (request.url?.absoluteString)!, parameters)
+            ///对url进行md5加密
             let key = absoluterURL.md5()
+            ///将加密过的url作为目录拼接到默认路径
             let path = directoryPath.appending(key)
+            ///将请求数据转换成data
             let dict:AnyObject = responseObject
             var data:Data? = nil
             do{
                 try data = JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
             }catch{
             }
+            ///将data存储到指定路径
             if data != nil{
                 let isOk = FileManager.default.createFile(atPath: path,
                                                           contents: data,
@@ -332,7 +338,7 @@ class EWNetworking: NSObject {
             }
         }
     }
-    ///请求成功
+    ///解析缓存数据
     class func successResponse(responseData: Any,callback success: EWResponseSuccess){
         success(self.tryToParseData(responseData: responseData))
     }
