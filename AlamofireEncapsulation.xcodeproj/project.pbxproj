@@ -233,13 +233,16 @@
 				TargetAttributes = {
 					7963FE34214257070004C382 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1000;
 					};
 					7963FE48214257120004C382 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1000;
 						TestTargetID = 7963FE34214257070004C382;
 					};
 					7963FE53214257120004C382 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1000;
 						TestTargetID = 7963FE34214257070004C382;
 					};
 				};
@@ -526,7 +529,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/AlamofireEncapsulation-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -546,7 +549,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/$(PROJECT_NAME)/AlamofireEncapsulation-Bridging-Header.h";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -566,7 +569,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AlamofireEncapsulation.app/AlamofireEncapsulation";
 			};
@@ -587,7 +590,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AlamofireEncapsulation.app/AlamofireEncapsulation";
 			};
@@ -607,7 +610,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulationUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = AlamofireEncapsulation;
 			};
@@ -627,7 +630,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.Ethan.AlamofireEncapsulationUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = AlamofireEncapsulation;
 			};
