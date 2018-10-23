@@ -12,10 +12,10 @@ import SwiftyJSON
 ///环境url,根据自己需求更改
 #if PRODUCTION
 let baseDomain = "http://www.baidu.com"
-let basePicPath = "http://www.baidu.com/upload/"
+let basePicPath = "http://www.baidu.com/upload"
 #else
-let baseDomain = "http://192.168.1.213:8000/"
-let basePicPath = "http://192.168.1.213:8000/upload/"
+let baseDomain = "http://192.168.1.213:8002"
+let basePicPath = "http://192.168.1.213:8002/upload"
 #endif
 
 typealias EWResponseSuccess = (_ response: AnyObject)->()
@@ -28,31 +28,52 @@ typealias ELNetworkStatus = (_ EWNetworkStatus: Int32)->()
     case WWAN             = 1//2，3，4G网络
     case WiFi             = 2//WIFI网络
 }
-///baseURL,可以通过修改来实现切换开发环境与生产环境
-var ew_privateNetworkBaseUrl: String?
-///默认超时时间
-var ew_timeout: TimeInterval = 45
-///自定义manager
-var manager: SessionManager? = nil
-/**** 请求header
- *  根据后台需求,如果需要在header中传类似token的标识
- *  就可以通过在这里设置来实现全局使用
- *  这里是将token存在keychain中,可以根据自己项目需求存在合适的位置.
- */
-var ew_httpHeaders: Dictionary<String,String>? {
-    get{
-        guard let tokenData = Keychain.load(key: "token") else { return nil }
-        let token = NSKeyedUnarchiver.unarchiveObject(with: tokenData)
-        return ["token":token] as? Dictionary<String, String>
-    }
-}
-///缓存存储地址
-let cachePath = NSHomeDirectory() + "/Documents/AlamofireCaches/"
-///当前网络状态
-var ew_NetworkStatus: EWNetworkStatus = EWNetworkStatus.WiFi
 
 class EWNetworking: NSObject {
-    class func getWith(url: String,
+
+    static let ShareInstance = EWNetworking()
+    private lazy var manager: SessionManager = {
+        let config:URLSessionConfiguration = URLSessionConfiguration.default
+        let serverTrustPolicies: [String: ServerTrustPolicy] = [
+            ///正式环境的证书配置,修改成自己项目的正式url
+            "www.baidu.com": .pinCertificates(
+                certificates: ServerTrustPolicy.certificates(),
+                validateCertificateChain: true,
+                validateHost: true
+            ),
+            ///测试环境的证书配置,不验证证书,无脑通过
+            "192.168.1.213:8002": .disableEvaluation,
+            ]
+        config.httpAdditionalHeaders = ew_httpHeaders
+        config.timeoutIntervalForRequest = ew_timeout
+        //根据config创建manager
+        return SessionManager(configuration: config,
+                                 delegate: SessionDelegate(),
+                                 serverTrustPolicyManager: ServerTrustPolicyManager(policies: serverTrustPolicies))
+    }()
+
+    ///baseURL,可以通过修改来实现切换开发环境与生产环境
+    private var ew_privateNetworkBaseUrl: String?
+    ///默认超时时间
+    private var ew_timeout: TimeInterval = 45
+    /**** 请求header
+     *  根据后台需求,如果需要在header中传类似token的标识
+     *  就可以通过在这里设置来实现全局使用
+     *  这里是将token存在keychain中,可以根据自己项目需求存在合适的位置.
+     */
+    private var ew_httpHeaders: Dictionary<String,String>? {
+        get{
+            guard let tokenData = Keychain.load(key: "token") else { return nil }
+            let token = NSKeyedUnarchiver.unarchiveObject(with: tokenData)
+            return ["token":token] as? Dictionary<String, String>
+        }
+    }
+    ///缓存存储地址
+    private  let cachePath = NSHomeDirectory() + "/Documents/AlamofireCaches/"
+    ///当前网络状态
+    private var ew_NetworkStatus: EWNetworkStatus = EWNetworkStatus.WiFi
+
+    public func getWith(url: String,
                        params:Dictionary<String,Any>?,
                        success: @escaping EWResponseSuccess,
                        error: @escaping EWResponseFail){
@@ -62,7 +83,7 @@ class EWNetworking: NSObject {
                     success: success,
                     error: error)
     }
-    class func postWith(url: String,
+    public func postWith(url: String,
                         params: Dictionary<String,Any>,
                         success: @escaping EWResponseSuccess,
                         error: @escaping EWResponseFail){
@@ -73,7 +94,7 @@ class EWNetworking: NSObject {
                     error: error)
     }
     ///核心方法
-    class func requestWith(url: String,
+    public func requestWith(url: String,
                            httpMethod: Int32,
                            params: Dictionary<String,Any>?,
                            success: @escaping EWResponseSuccess,
@@ -89,7 +110,6 @@ class EWNetworking: NSObject {
                 return
             }
         }
-        getManager()
         let encodingUrl = encodingURL(path: url)
         let absolute = absoluteUrlWithPath(path: encodingUrl)
         let lastUrl = buildAPIString(path: absolute)
@@ -104,7 +124,7 @@ class EWNetworking: NSObject {
             //无网络状态获取缓存
             if ew_NetworkStatus.rawValue == EWNetworkStatus.NotReachable.rawValue
                 || ew_NetworkStatus.rawValue == EWNetworkStatus.Unknown.rawValue {
-                let response = EWNetworking.cahceResponseWithURL(url: lastUrl,
+                let response = self.cahceResponseWithURL(url: lastUrl,
                                                                  paramters: params)
                 if response != nil{
                     self.successResponse(responseData: response!, callback: success)
@@ -112,7 +132,7 @@ class EWNetworking: NSObject {
                     return
                 }
             }
-            manager?.request(lastUrl,
+            manager.request(lastUrl,
                              method: .get,
                              parameters: params,
                              encoding: URLEncoding.default,
@@ -140,7 +160,7 @@ class EWNetworking: NSObject {
             }
         }else{
             //post
-            manager?.request(lastUrl,
+            manager.request(lastUrl,
                              method: .post,
                              parameters: params!,
                              encoding: JSONEncoding.default,
@@ -163,38 +183,18 @@ class EWNetworking: NSObject {
             }
         }
     }
-    class func updateBaseUrl(baseUrl:String){
+    public func updateBaseUrl(baseUrl:String){
         ew_privateNetworkBaseUrl = baseUrl
     }
-    class func baseUrl()->String?{
+    public func baseUrl()->String?{
         return ew_privateNetworkBaseUrl
     }
-    //获取alamofire.manager
-    class func getManager(){
-        let config:URLSessionConfiguration = URLSessionConfiguration.default
-        let serverTrustPolicies: [String: ServerTrustPolicy] = [
-            ///正式环境的证书配置,修改成自己项目的正式url
-            "www.baidu.com": .pinCertificates(
-                certificates: ServerTrustPolicy.certificates(),
-                validateCertificateChain: true,
-                validateHost: true
-            ),
-            ///测试环境的证书配置,不验证证书,无脑通过
-            "192.168.1.213:8002/": .disableEvaluation,
-            ]
-        config.httpAdditionalHeaders = ew_httpHeaders
-        config.timeoutIntervalForRequest = ew_timeout
-        //根据config创建manager
-        manager = SessionManager(configuration: config,
-                                 delegate: SessionDelegate(),
-                                 serverTrustPolicyManager: ServerTrustPolicyManager(policies: serverTrustPolicies))
-    }
     //中文路径encoding
-    class func encodingURL(path: String)->String{
+    public func encodingURL(path: String)->String{
         return path.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
     }
     //拼接baseurl生成完整url
-    class func absoluteUrlWithPath(path:String?)->String{
+    public func absoluteUrlWithPath(path:String?)->String{
         if path == nil
             || path?.length == 0 {
             return ""
@@ -225,7 +225,7 @@ class EWNetworking: NSObject {
         return absoluteUrl!
     }
     /// 在url最后添加一部分,这里是添加的选择语言,可以根据需求修改.
-    class func buildAPIString(path:String)->String{
+    public func buildAPIString(path:String)->String{
         if path.containsIgnoringCase(find: "http://")
             || path.containsIgnoringCase(find: "https://"){
             return path
@@ -240,7 +240,7 @@ class EWNetworking: NSObject {
         return str
     }
     ///从缓存中获取数据
-    class func cahceResponseWithURL(url: String,paramters: Dictionary<String,Any>?) -> Any?{
+    public func cahceResponseWithURL(url: String,paramters: Dictionary<String,Any>?) -> Any?{
         var cacheData:Any? = nil
         let directorPath = cachePath
         let absoluteURL = self.generateGETAbsoluteURL(url: url, paramters)
@@ -255,7 +255,7 @@ class EWNetworking: NSObject {
         return cacheData
     }
     //get请求下把参数拼接到url上
-    class func generateGETAbsoluteURL(url: String,_ params: Dictionary<String,Any>?)->String{
+    public func generateGETAbsoluteURL(url: String,_ params: Dictionary<String,Any>?)->String{
         guard let params = params else {return url}
         if params.count == 0{
             return url
@@ -296,7 +296,7 @@ class EWNetworking: NSObject {
     ///   - responseObject: 缓存数据
     ///   - request: 请求
     ///   - parameters: 参数
-    class func cacheResponseObject(responseObject: AnyObject,
+    public func cacheResponseObject(responseObject: AnyObject,
                                    request: URLRequest,
                                    parameters: Dictionary<String,Any>?){
         if !(responseObject is NSNull) {
@@ -339,11 +339,11 @@ class EWNetworking: NSObject {
         }
     }
     ///解析缓存数据
-    class func successResponse(responseData: Any,callback success: EWResponseSuccess){
+    public func successResponse(responseData: Any,callback success: EWResponseSuccess){
         success(self.tryToParseData(responseData: responseData))
     }
     ///解析数据
-    class func tryToParseData(responseData: Any) -> AnyObject {
+    public func tryToParseData(responseData: Any) -> AnyObject {
         if responseData is Data{
             do{
                 let json =  try JSON(data: responseData as! Data)
@@ -356,29 +356,30 @@ class EWNetworking: NSObject {
         }
     }
     ///监听网络状态
-    class func detectNetwork(netWorkStatus: @escaping ELNetworkStatus){
+    public func detectNetwork(netWorkStatus: @escaping ELNetworkStatus){
         let reachability = NetworkReachabilityManager()
         reachability?.startListening()
-        reachability?.listener = { status in
+        reachability?.listener = { [weak self] status in
+            guard let weakSelf = self else { return }
             if reachability?.isReachable ?? false {
                 switch status {
                 case .notReachable:
-                    ew_NetworkStatus = EWNetworkStatus.NotReachable
+                    weakSelf.ew_NetworkStatus = EWNetworkStatus.NotReachable
                 case .unknown:
-                    ew_NetworkStatus = EWNetworkStatus.Unknown
+                    weakSelf.ew_NetworkStatus = EWNetworkStatus.Unknown
                 case .reachable(.wwan):
-                    ew_NetworkStatus = EWNetworkStatus.WWAN
+                    weakSelf.ew_NetworkStatus = EWNetworkStatus.WWAN
                 case .reachable(.ethernetOrWiFi):
-                    ew_NetworkStatus = EWNetworkStatus.WiFi
+                    weakSelf.ew_NetworkStatus = EWNetworkStatus.WiFi
                 }
             }else{
-                ew_NetworkStatus = EWNetworkStatus.NotReachable
+                weakSelf.ew_NetworkStatus = EWNetworkStatus.NotReachable
             }
-            netWorkStatus(ew_NetworkStatus.rawValue)
+            netWorkStatus(weakSelf.ew_NetworkStatus.rawValue)
         }
     }
     ///监听网络状态
-    class func obtainDataFromLocalWhenNetworkUnconnected(){
+    public func obtainDataFromLocalWhenNetworkUnconnected(){
         self.detectNetwork { (CRNetworkStatus) in
         }
     }

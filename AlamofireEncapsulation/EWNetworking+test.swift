@@ -10,11 +10,11 @@ import Foundation
 
 extension EWNetworking{
     ///get请求demo
-    class func getDataTest(id: String,
+    public func getDataTest(id: String,
                        success: @escaping EWResponseSuccess,
                        failure: @escaping EWResponseFail){
-        let path = "/test"
-        EWNetworking.getWith(url: path, params: ["id": id], success: { (response) in
+        let path = "test"
+        EWNetworking.ShareInstance.getWith(url: path, params: ["id": id], success: { (response) in
             guard let json = response as? [String:Any] else { return }
             ///保证接口调通, 否则返回错误信息
             guard json["status"] as! NSNumber == 1 else {
@@ -38,11 +38,11 @@ extension EWNetworking{
         }
     }
     ///post请求demo
-    class func postDataTest(id: String,
+    public func postDataTest(id: String,
                                 success: @escaping EWResponseSuccess,
                                 failure: @escaping EWResponseFail){
-        let path = "/activity_enroll"
-        EWNetworking.postWith(url: path, params: ["id": id], success: { (response) in
+        let path = "v1/passport/register"
+        EWNetworking.ShareInstance.postWith(url: path, params: ["id": id], success: { (response) in
             guard let json = response as? [String:Any] else { return }
             guard json["status"] as! NSNumber == 1 else {
 //                MBProgressHud.showTextHudTips(message: json["msg"] as? String)

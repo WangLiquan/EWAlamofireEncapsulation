@@ -16,7 +16,7 @@ class ViewController: UIViewController {
         postDemo()
     }
     func getDemo(){
-        EWNetworking.getDataTest(id: "1", success: { [weak self] (response) in
+        EWNetworking.ShareInstance.getDataTest(id: "1", success: { [weak self] (response) in
             guard let weakSelf = self else { return }
             guard let model = response as? [String] else { return }
             ///根据获取model来进行相应操作
@@ -24,7 +24,7 @@ class ViewController: UIViewController {
         }
     }
     func postDemo(){
-        EWNetworking.postDataTest(id: "1", success: { [weak self] (response) in
+        EWNetworking.ShareInstance.postDataTest(id: "1", success: { [weak self] (response) in
             guard let weakSelf = self else { return }
             guard let model = response as? [String] else { return }
             ///根据获取model来进行相应操作
