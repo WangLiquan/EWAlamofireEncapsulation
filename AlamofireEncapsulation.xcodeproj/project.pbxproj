@@ -175,6 +175,7 @@
 				7963FE32214257070004C382 /* Frameworks */,
 				7963FE33214257070004C382 /* Resources */,
 				2E0A3D8ADFCFD5AD9688A906 /* [CP] Embed Pods Frameworks */,
+				79D7D6DB2217D29000D42998 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -332,6 +333,23 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AlamofireEncapsulation/Pods-AlamofireEncapsulation-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		79D7D6DB2217D29000D42998 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

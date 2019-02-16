@@ -15,21 +15,22 @@ class ViewController: UIViewController {
         getDemo()
         postDemo()
     }
-    func getDemo(){
-        EWNetworking.ShareInstance.getDataTest(id: "1", success: { [weak self] (response) in
+    func getDemo() {
+        EWNetworking.ShareInstance.getDataTest(test: "1", success: { [weak self] (response) in
             guard let weakSelf = self else { return }
             guard let model = response as? [String] else { return }
             ///根据获取model来进行相应操作
-        }) { (error) in
-        }
+        }, failure: { (_) in
+        })
+
     }
-    func postDemo(){
-        EWNetworking.ShareInstance.postDataTest(id: "1", success: { [weak self] (response) in
+    func postDemo() {
+        EWNetworking.ShareInstance.postDataTest(test: "1", success: { [weak self] (response) in
             guard let weakSelf = self else { return }
             guard let model = response as? [String] else { return }
             ///根据获取model来进行相应操作
-        }) { (error) in
-        }
+        }, failure: { (_) in
+        })
     }
 
     override func didReceiveMemoryWarning() {
@@ -37,6 +38,4 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-
 }
-

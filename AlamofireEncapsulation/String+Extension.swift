@@ -14,7 +14,7 @@ extension String {
         return self.utf16.count
     }
     ///是否包含字符串
-    func containsIgnoringCase(find: String) -> Bool{
+    func containsIgnoringCase(find: String) -> Bool {
         return self.range(of: find, options: .caseInsensitive) != nil
     }
     ///md5加密,添加这个方法后还要添加与oc的bridging文件
@@ -26,10 +26,10 @@ extension String {
 
         CC_MD5(str!, strLen, result)
         let hash = NSMutableString()
-        for i in 0 ..< digestLen {
-            hash.appendFormat("%02x", result[i])
+        for num in 0 ..< digestLen {
+            hash.appendFormat("%02x", result[num])
         }
-        result.deinitialize()
+        result.deinitialize(count: 1)
 
         return String(format: hash as String)
     }
@@ -40,7 +40,8 @@ extension String {
     func stringCutToEnd(star: Int) -> String {
         if !(star < count) { return "截取超出范围" }
         let sRang = index(startIndex, offsetBy: star)..<endIndex
-        return substring(with: sRang)
+        return String(self[sRang])
+//        return substring(with: sRang)
     }
 
 }

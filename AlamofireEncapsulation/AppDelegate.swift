@@ -7,19 +7,17 @@
 //
 
 import UIKit
-
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         initApp()
         return true
     }
 
-    private func initApp(){
+    private func initApp() {
         ///设定baseURL
         let apiURL = URL(string: baseDomain)
         EWNetworking.ShareInstance.updateBaseUrl(baseUrl: (apiURL?.absoluteString)!)
@@ -48,6 +46,4 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
 }
-

@@ -8,22 +8,22 @@
 
 import Foundation
 
-extension EWNetworking{
+extension EWNetworking {
     ///get请求demo
-    public func getDataTest(id: String,
-                       success: @escaping EWResponseSuccess,
-                       failure: @escaping EWResponseFail){
+    public func getDataTest(test: String,
+                            success: @escaping EWResponseSuccess,
+                            failure: @escaping EWResponseFail) {
         let path = "test"
-        EWNetworking.ShareInstance.getWith(url: path, params: ["id": id], success: { (response) in
-            guard let json = response as? [String:Any] else { return }
+        EWNetworking.ShareInstance.getWith(url: path, params: ["id": test], success: { (response) in
+            guard let json = response as? [String: Any] else { return }
             ///保证接口调通, 否则返回错误信息
-            guard json["status"] as! NSNumber == 1 else {
+            guard json["status"] as? NSNumber == 1 else {
 //                MBProgressHud.showTextHudTips(message: json["msg"] as? String)
-                print(json["msg"])
+                print(json["msg"] as? String)
                 failure(response)
                 return
             }
-            guard let dict = json["obj"] as? [String:Any] else {
+            guard let dict = json["obj"] as? [String: Any] else {
                 failure(NSError(domain: "转字典失败", code: 2000, userInfo: nil))
                 return
             }
@@ -38,22 +38,22 @@ extension EWNetworking{
         }
     }
     ///post请求demo
-    public func postDataTest(id: String,
-                                success: @escaping EWResponseSuccess,
-                                failure: @escaping EWResponseFail){
+    public func postDataTest(test: String,
+                             success: @escaping EWResponseSuccess,
+                             failure: @escaping EWResponseFail) {
         let path = "v1/passport/register"
-        EWNetworking.ShareInstance.postWith(url: path, params: ["id": id], success: { (response) in
-            guard let json = response as? [String:Any] else { return }
-            guard json["status"] as! NSNumber == 1 else {
-//                MBProgressHud.showTextHudTips(message: json["msg"] as? String)
-                print(json["msg"])
+        EWNetworking.ShareInstance.postWith(url: path, params: ["id": test], success: { (response) in
+            guard let json = response as? [String: Any] else { return }
+            guard json["status"] as? NSNumber == 1 else {
+                //                MBProgressHud.showTextHudTips(message: json["msg"] as? String)
+                print(json["msg"] as? String)
                 failure(response)
                 return
             }
             success(response as AnyObject)
         }) { (error) in
             failure(error)
-//            MBProgressHud.showTextHudTips(message: "网络请求错误")
+            //            MBProgressHud.showTextHudTips(message: "网络请求错误")
         }
     }
 }
