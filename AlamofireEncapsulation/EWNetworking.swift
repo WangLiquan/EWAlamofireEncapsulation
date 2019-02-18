@@ -4,8 +4,6 @@
 //
 //  Created by Ethan.Wang on 2018/9/7.
 //  Copyright © 2018年 Ethan. All rights reserved.
-//
-
 import UIKit
 import Alamofire
 import SwiftyJSON
@@ -30,7 +28,6 @@ typealias ELNetworkStatus = (_ EWNetworkStatus: Int32) -> Void
 }
 
 class EWNetworking: NSObject {
-
     static let ShareInstance = EWNetworking()
     private lazy var manager: SessionManager = {
         let config: URLSessionConfiguration = URLSessionConfiguration.default
@@ -51,7 +48,6 @@ class EWNetworking: NSObject {
                                  delegate: SessionDelegate(),
                                  serverTrustPolicyManager: ServerTrustPolicyManager(policies: serverTrustPolicies))
     }()
-
     ///baseURL,可以通过修改来实现切换开发环境与生产环境
     private var ewPrivateNetworkBaseUrl: String?
     ///默认超时时间
@@ -62,11 +58,9 @@ class EWNetworking: NSObject {
      *  这里是将token存在keychain中,可以根据自己项目需求存在合适的位置.
      */
     private var ewHttpHeaders: [String:String]? {
-        get {
-            guard let tokenData = Keychain.load(key: "token") else { return nil }
-            let token = NSKeyedUnarchiver.unarchiveObject(with: tokenData)
-            return ["token": token] as? [String:String]
-        }
+        guard let tokenData = Keychain.load(key: "token") else { return nil }
+        let token = NSKeyedUnarchiver.unarchiveObject(with: tokenData)
+        return ["token": token] as? [String:String]
     }
     ///缓存存储地址
     private  let cachePath = NSHomeDirectory() + "/Documents/AlamofireCaches/"
@@ -132,112 +126,101 @@ class EWNetworking: NSObject {
                     return
                 }
             }
-            manager.request(lastUrl,
-                             method: .get,
-                             parameters: params,
-                             encoding: URLEncoding.default,
-                             headers: nil).responseJSON { (response) in
-                                switch response.result {
-                                case .success:
-                                    if let value = response.result.value as? [String: Any] {
-                                        ///添加一些全部接口都有的一些状态判断
-                                        if value["status"] as? Int == 1010 {
-                                            error("登录超时,请重新登录" as AnyObject)
-                                            _ = Keychain.clear()
-                                            return
-                                        }
-                                        success(value as AnyObject)
-                                        //缓存数据
-                                        self.cacheResponseObject(responseObject: value as AnyObject,
-                                                                 request: response.request!,
-                                                                 parameters: nil)
-                                    }
-                                case .failure(let err):
-                                    error(err as AnyObject)
-                                    debugPrint(err)
-                                }
-            }
+            manageGet(url: lastUrl, params: params, success: success, error: error)
         } else {
-            //post
-            manager.request(lastUrl,
-                             method: .post,
-                             parameters: params!,
-                             encoding: JSONEncoding.default,
-                             headers: nil).responseJSON { (response) in
-                                switch response.result {
-                                case .success:
-                                    ///添加一些全部接口都有的一些状态判断
-                                    if let value = response.result.value as? [String: Any] {
-                                        if value["status"] as? Int == 1010 {
-                                            error("登录超时,请重新登录" as AnyObject)
-                                            _ = Keychain.clear()
-                                            return
-                                        }
-                                        success(value as AnyObject)
+            managePost(url: lastUrl, params: params!, success: success, error: error)
+        }
+    }
+    private func managePost(url: String,
+                            params: [String: Any],
+                            success: @escaping EWResponseSuccess,
+                            error: @escaping EWResponseFail) {
+        manager.request(url,
+                        method: .post,
+                        parameters: params,
+                        encoding: JSONEncoding.default,
+                        headers: nil).responseJSON { (response) in
+                            switch response.result {
+                            case .success:
+                                ///添加一些全部接口都有的一些状态判断
+                                if let value = response.result.value as? [String: Any] {
+                                    if value["status"] as? Int == 1010 {
+                                        error("登录超时,请重新登录" as AnyObject)
+                                        _ = Keychain.clear()
+                                        return
                                     }
-                                case .failure(let err):
-                                    error(err as AnyObject)
-                                    debugPrint(error)
+                                    success(value as AnyObject)
                                 }
-            }
+                            case .failure(let err):
+                                error(err as AnyObject)
+                                debugPrint(error)
+                            }
         }
     }
-    public func updateBaseUrl(baseUrl: String) {
-        ewPrivateNetworkBaseUrl = baseUrl
-    }
-    public func baseUrl() -> String? {
-        return ewPrivateNetworkBaseUrl
-    }
-    //中文路径encoding
-    public func encodingURL(path: String) -> String {
-        return path.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-    }
-    //拼接baseurl生成完整url
-    public func absoluteUrlWithPath(path: String?) -> String {
-        if path == nil
-            || path?.length == 0 {
-            return ""
+    private func manageGet(url: String,
+                           params: [String: Any]?,
+                           success: @escaping EWResponseSuccess,
+                           error: @escaping EWResponseFail) {
+        manager.request(url,
+                        method: .get,
+                        parameters: params,
+                        encoding: URLEncoding.default,
+                        headers: nil).responseJSON { (response) in
+                            switch response.result {
+                            case .success:
+                                if let value = response.result.value as? [String: Any] {
+                                    ///添加一些全部接口都有的一些状态判断
+                                    if value["status"] as? Int == 1010 {
+                                        error("登录超时,请重新登录" as AnyObject)
+                                        _ = Keychain.clear()
+                                        return
+                                    }
+                                    success(value as AnyObject)
+                                    //缓存数据
+                                    self.cacheResponseObject(responseObject: value as AnyObject,
+                                                             request: response.request!,
+                                                             parameters: nil)
+                                }
+                            case .failure(let err):
+                                error(err as AnyObject)
+                                debugPrint(err)
+                            }
         }
-        if self.baseUrl() == nil
-            || self.baseUrl()?.length == 0 {
-            return path!
-        }
-        var absoluteUrl = path
-        if !(path?.hasPrefix("http://"))!
-            && !(path?.hasPrefix("https://"))! {
-            if (self.baseUrl()?.hasPrefix("/"))! {
-                if (path?.hasPrefix("/"))! {
-                    var mutablePath = path
-                    mutablePath?.remove(at: (path?.startIndex)!)
-                    absoluteUrl = self.baseUrl()! + mutablePath!
-                } else {
-                    absoluteUrl = self.baseUrl()! + path!
+    }
+}
+// MARK: 网络状态相关
+extension EWNetworking {
+    ///监听网络状态
+    public func detectNetwork(netWorkStatus: @escaping ELNetworkStatus) {
+        let reachability = NetworkReachabilityManager()
+        reachability?.startListening()
+        reachability?.listener = { [weak self] status in
+            guard let weakSelf = self else { return }
+            if reachability?.isReachable ?? false {
+                switch status {
+                case .notReachable:
+                    weakSelf.ewNetworkStatus = EWNetworkStatus.notReachable
+                case .unknown:
+                    weakSelf.ewNetworkStatus = EWNetworkStatus.unknown
+                case .reachable(.wwan):
+                    weakSelf.ewNetworkStatus = EWNetworkStatus.wwan
+                case .reachable(.ethernetOrWiFi):
+                    weakSelf.ewNetworkStatus = EWNetworkStatus.wifi
                 }
             } else {
-                if (path?.hasPrefix("/"))! {
-                    absoluteUrl = self.baseUrl()! + path!
-                } else {
-                    absoluteUrl = self.baseUrl()! + "/" + path!
-                }
+                weakSelf.ewNetworkStatus = EWNetworkStatus.notReachable
             }
+            netWorkStatus(weakSelf.ewNetworkStatus.rawValue)
         }
-        return absoluteUrl!
     }
-    /// 在url最后添加一部分,这里是添加的选择语言,可以根据需求修改.
-    public func buildAPIString(path: String) -> String {
-        if path.containsIgnoringCase(find: "http://")
-            || path.containsIgnoringCase(find: "https://") {
-            return path
+    ///监听网络状态
+    public func obtainDataFromLocalWhenNetworkUnconnected() {
+        self.detectNetwork { (_) in
         }
-        let lang = "zh_CN"
-        var str = ""
-        if path.containsIgnoringCase(find: "?") {
-            str = path + "&@lang=" + lang
-        } else {
-            str = path + "?@lang=" + lang
-        }
-        return str
     }
+}
+// MARK: 缓存数据相关
+extension EWNetworking {
     ///从缓存中获取数据
     public func cahceResponseWithURL(url: String, paramters: [String: Any]?) -> Any? {
         var cacheData: Any?
@@ -252,42 +235,6 @@ class EWNetworking: NSObject {
             print("Read data from cache for url: \(url)\n")
         }
         return cacheData
-    }
-    //get请求下把参数拼接到url上
-    public func generateGETAbsoluteURL(url: String, _ params: [String: Any]?) -> String {
-        guard let params = params else {return url}
-        if params.count == EMPTY {
-            return url
-        }
-        var url = url
-        var queries = ""
-        for key in (params.keys) {
-            let value = params[key]
-            if value is [String: Any] {
-                continue
-            } else if value is [Any] {
-                continue
-            } else if value is Set<AnyHashable> {
-                continue
-            } else {
-                queries = queries.length == 0 ? "&" : queries + key + "=" + "\(value as? String)"
-            }
-        }
-        if queries.length > 1 {
-            queries = String(queries[queries.startIndex..<queries.endIndex])
-        }
-        if (url.hasPrefix("http://")
-            || url.hasPrefix("https://")
-            && queries.length > 1) {
-            if url.containsIgnoringCase(find: "?")
-                || url.containsIgnoringCase(find: "#") {
-                url = "\(url)\(queries)"
-            } else {
-                queries = queries.stringCutToEnd(star: 1)
-                url = "\(url)?\(queries)"
-            }
-        }
-        return url.length == 0 ? queries : url
     }
     /// 进行数据缓存
     ///
@@ -353,32 +300,101 @@ class EWNetworking: NSObject {
             return responseData as AnyObject
         }
     }
-    ///监听网络状态
-    public func detectNetwork(netWorkStatus: @escaping ELNetworkStatus) {
-        let reachability = NetworkReachabilityManager()
-        reachability?.startListening()
-        reachability?.listener = { [weak self] status in
-            guard let weakSelf = self else { return }
-            if reachability?.isReachable ?? false {
-                switch status {
-                case .notReachable:
-                    weakSelf.ewNetworkStatus = EWNetworkStatus.notReachable
-                case .unknown:
-                    weakSelf.ewNetworkStatus = EWNetworkStatus.unknown
-                case .reachable(.wwan):
-                    weakSelf.ewNetworkStatus = EWNetworkStatus.wwan
-                case .reachable(.ethernetOrWiFi):
-                    weakSelf.ewNetworkStatus = EWNetworkStatus.wifi
+}
+// MARK: url拼接相关
+extension EWNetworking {
+    /// 更新baseURL
+    public func updateBaseUrl(baseUrl: String) {
+        ewPrivateNetworkBaseUrl = baseUrl
+    }
+    /// 获取baseURL
+    public func baseUrl() -> String? {
+        return ewPrivateNetworkBaseUrl
+    }
+    ///中文路径encoding
+    public func encodingURL(path: String) -> String {
+        return path.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+    }
+    ///拼接baseurl生成完整url
+    public func absoluteUrlWithPath(path: String?) -> String {
+        if path == nil
+            || path?.length == 0 {
+            return ""
+        }
+        if self.baseUrl() == nil
+            || self.baseUrl()?.length == 0 {
+            return path!
+        }
+        var absoluteUrl = path
+        if !(path?.hasPrefix("http://"))!
+            && !(path?.hasPrefix("https://"))! {
+            if (self.baseUrl()?.hasPrefix("/"))! {
+                if (path?.hasPrefix("/"))! {
+                    var mutablePath = path
+                    mutablePath?.remove(at: (path?.startIndex)!)
+                    absoluteUrl = self.baseUrl()! + mutablePath!
+                } else {
+                    absoluteUrl = self.baseUrl()! + path!
                 }
             } else {
-                weakSelf.ewNetworkStatus = EWNetworkStatus.notReachable
+                if (path?.hasPrefix("/"))! {
+                    absoluteUrl = self.baseUrl()! + path!
+                } else {
+                    absoluteUrl = self.baseUrl()! + "/" + path!
+                }
             }
-            netWorkStatus(weakSelf.ewNetworkStatus.rawValue)
         }
+        return absoluteUrl!
     }
-    ///监听网络状态
-    public func obtainDataFromLocalWhenNetworkUnconnected() {
-        self.detectNetwork { (_) in
+    /// 在url最后添加一部分,这里是添加的选择语言,可以根据需求修改.
+    public func buildAPIString(path: String) -> String {
+        if path.containsIgnoringCase(find: "http://")
+            || path.containsIgnoringCase(find: "https://") {
+            return path
         }
+        let lang = "zh_CN"
+        var str = ""
+        if path.containsIgnoringCase(find: "?") {
+            str = path + "&@lang=" + lang
+        } else {
+            str = path + "?@lang=" + lang
+        }
+        return str
+    }
+    /// get请求下把参数拼接到url上
+    public func generateGETAbsoluteURL(url: String, _ params: [String: Any]?) -> String {
+        guard let params = params else {return url}
+        if params.count == EMPTY {
+            return url
+        }
+        var url = url
+        var queries = ""
+        for key in (params.keys) {
+            let value = params[key]
+            if value is [String: Any] {
+                continue
+            } else if value is [Any] {
+                continue
+            } else if value is Set<AnyHashable> {
+                continue
+            } else {
+                queries = queries.length == 0 ? "&" : queries + key + "=" + "\(value as? String ?? "")"
+            }
+        }
+        if queries.length > 1 {
+            queries = String(queries[queries.startIndex..<queries.endIndex])
+        }
+        if (url.hasPrefix("http://")
+            || url.hasPrefix("https://")
+            && queries.length > 1) {
+            if url.containsIgnoringCase(find: "?")
+                || url.containsIgnoringCase(find: "#") {
+                url = "\(url)\(queries)"
+            } else {
+                queries = queries.stringCutToEnd(star: 1)
+                url = "\(url)?\(queries)"
+            }
+        }
+        return url.length == 0 ? queries : url
     }
 }

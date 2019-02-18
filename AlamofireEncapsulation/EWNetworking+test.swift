@@ -19,7 +19,7 @@ extension EWNetworking {
             ///保证接口调通, 否则返回错误信息
             guard json["status"] as? NSNumber == 1 else {
 //                MBProgressHud.showTextHudTips(message: json["msg"] as? String)
-                print(json["msg"] as? String)
+                print(json["msg"] as? String ?? "")
                 failure(response)
                 return
             }
@@ -32,10 +32,10 @@ extension EWNetworking {
                 return
             }
             success(dataArray as AnyObject)
-        }) { (error) in
+        },error: { (error) in
             failure(error)
 //            MBProgressHud.showTextHudTips(message: "网络请求错误")
-        }
+        })
     }
     ///post请求demo
     public func postDataTest(test: String,
@@ -46,14 +46,14 @@ extension EWNetworking {
             guard let json = response as? [String: Any] else { return }
             guard json["status"] as? NSNumber == 1 else {
                 //                MBProgressHud.showTextHudTips(message: json["msg"] as? String)
-                print(json["msg"] as? String)
+                print(json["msg"] as? String ?? "")
                 failure(response)
                 return
             }
             success(response as AnyObject)
-        }) { (error) in
+        },error: { (error) in
             failure(error)
             //            MBProgressHud.showTextHudTips(message: "网络请求错误")
-        }
+        })
     }
 }
