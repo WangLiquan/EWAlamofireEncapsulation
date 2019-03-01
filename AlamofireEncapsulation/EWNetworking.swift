@@ -6,7 +6,6 @@
 //  Copyright © 2018年 Ethan. All rights reserved.
 import UIKit
 import Alamofire
-import SwiftyJSON
 ///环境url,根据自己需求更改
 #if PRODUCTION
 let baseDomain = "http://www.baidu.com"
@@ -294,7 +293,7 @@ extension EWNetworking {
             return responseData as AnyObject
         }
         do {
-            let json =  try JSON(data: data)
+            let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers)
             return json as AnyObject
         } catch {
             return responseData as AnyObject
