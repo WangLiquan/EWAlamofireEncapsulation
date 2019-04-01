@@ -1,4 +1,6 @@
 # AlamofireEncapsulation
+[![996.icu](https://img.shields.io/badge/link-996.icu-red.svg)](https://996.icu)
+
 <h3>对Alamofire进行封装</h3>
 <p>实现了自动缓存,无网络时调用缓存数据,网络状态监听,默认header加入功能.</p>
 
